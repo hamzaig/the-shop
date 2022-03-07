@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useDispatch } from 'react-redux';
-import { getOrderDetails, payOrder } from '../actions/orderActions';
-import { ORDER_PAY_RESET } from "../constants/orderConstants";
+import { getOrderDetails, payOrder, deliverOrder } from '../actions/orderActions';
+import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from "../constants/orderConstants";
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
@@ -19,8 +19,14 @@ const OrderPage = () => {
   const orderDetails = useSelector(state => state.orderDetails);
   const { order, loading, error } = orderDetails;
 
+  const userLogin = useSelector(state => state.userLogin);
+  const { userInfo } = userLogin;
+
   const orderPay = useSelector(state => state.orderPay);
   const { loading: loadingPay, success: successPay } = orderPay;
+
+  const orderDeliver = useSelector(state => state.orderDeliver);
+  const { loading: loadingDeliver, success: successDeliver } = orderDeliver;
 
   if (!loading) {
     const addDecimals = (num) => {
@@ -33,13 +39,17 @@ const OrderPage = () => {
   }
 
   useEffect(() => {
+    if (!userInfo) {
+      navigate("/");
+    }
     // console.log(order);
     // console.log(successPay);
-    if (!order || successPay) {
+    if (!order || successPay || successDeliver) {
       dispatch({ type: ORDER_PAY_RESET })
+      dispatch({ type: ORDER_DELIVER_RESET })
       dispatch(getOrderDetails(orderId))
     }
-  }, [orderId, dispatch, successPay, order])
+  }, [orderId, dispatch, successPay, order, successDeliver])
 
   const successPaymentHandler = (e) => {
     // e.prevantDefault();
@@ -49,6 +59,10 @@ const OrderPage = () => {
       update_time: Date.now(),
       email_address: "hamzaig@yahoo.com"
     }))
+  }
+
+  const deliverHandler = () => {
+    dispatch(deliverOrder(order._id));
   }
 
   return (loading ? <Loader /> : error ? <Message variant={"danger"}>{error}</Message> :
@@ -142,7 +156,16 @@ const OrderPage = () => {
                   )}
                 </Row>
               </ListGroup.Item>
-
+              {loadingDeliver && <Loader />}
+              {userInfo?.isAdmin && order.isPaid && !order.isDelivered && (
+                <ListGroup.Item>
+                  <Row>
+                    {loadingPay ? <Loader /> : (
+                      <Button type='button' varinat="primary" onClick={deliverHandler}>Mark as Deliverd</Button>
+                    )}
+                  </Row>
+                </ListGroup.Item>
+              )}
             </ListGroup>
           </Card>
         </Col>

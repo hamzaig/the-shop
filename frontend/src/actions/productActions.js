@@ -89,3 +89,65 @@ export const createProduct = () => async (dispatch, getState) => {
     })
   }
 }
+
+
+export const updateProduct = (product) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: constants.PRODUCT_UPDATE_REQUEST,
+    })
+
+    const { userLogin: { userInfo } } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      }
+    };
+
+    const { data } = await axios.put(`/api/products/${product._id}`, product, config);
+
+    dispatch({
+      type: constants.PRODUCT_UPDATE_SUCCESS,
+      payload: data,
+    });
+
+  } catch (error) {
+    dispatch({
+      type: constants.PRODUCT_UPDATE_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message,
+    })
+  }
+}
+
+
+export const updateProduct = (productId, review) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: constants.PRODUCT_CREATE_REVIEW_REQUEST,
+    })
+
+    const { userLogin: { userInfo } } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      }
+    };
+
+    const { data } = await axios.post(`/api/products/${productId}/review`, { review }, config);
+
+    dispatch({
+      type: constants.PRODUCT_CREATE_REVIEW_SUCCESS,
+      payload: data,
+    });
+
+  } catch (error) {
+    dispatch({
+      type: constants.PRODUCT_CREATE_REVIEW_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message,
+    })
+  }
+}

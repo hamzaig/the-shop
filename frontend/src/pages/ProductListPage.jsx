@@ -5,7 +5,8 @@ import { Table, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { deleteProduct, listProducts } from "../actions/productActions";
+import { deleteProduct, listProducts, createProduct } from "../actions/productActions";
+import { PRODUCT_CREATE_RESET } from "../constants/productConstant";
 
 
 const ProductListPage = () => {
@@ -18,17 +19,23 @@ const ProductListPage = () => {
   const productDelete = useSelector(state => state.productDelete);
   const { loading: loadingDelete, success: successDelete, error: errorDelete } = productDelete;
 
+  const productCreate = useSelector(state => state.productCreate);
+  const { loading: loadingCreate, success: successCreate, error: errorCreate, product: createdProduct } = productCreate;
+
   const userLogin = useSelector(state => state.userLogin);
   const { userInfo } = userLogin;
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
+    dispatch({ type: PRODUCT_CREATE_RESET });
+    if (!userInfo.isAdmin) {
+      navigate("/login")
+    }
+    if (successCreate) {
+      navigate(`/admin/product/${createdProduct._id}/edit`)
+    } else {
       dispatch(listProducts());
     }
-    else {
-      navigate("/");
-    }
-  }, [dispatch, navigate, userInfo, successDelete]);
+  }, [dispatch, navigate, userInfo, successDelete, createdProduct, successCreate]);
 
   const deleteHandler = id => {
     if (window.confirm("Are you Sure")) {
@@ -37,7 +44,7 @@ const ProductListPage = () => {
   }
 
   const createProductHandler = () => {
-
+    dispatch(createProduct());
   }
 
   return (
@@ -54,6 +61,8 @@ const ProductListPage = () => {
       </Row>
       {loadingDelete && <Loader />}
       {errorDelete && <Message variant={"danger"}>{errorDelete}</Message>}
+      {loadingCreate && <Loader />}
+      {errorCreate && <Message variant={"danger"}>{errorCreate}</Message>}
       {loading ? <Loader /> : error ? <Message variant={"danger"}>{error}</Message> : (
         <Table striped bordered hover responsive className='table-sm'>
           <thead>
