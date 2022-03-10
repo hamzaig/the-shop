@@ -7,8 +7,19 @@ const asyncHandler = require("express-async-handler");
 @access   Public
 */
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
-  res.json(products);
+  const pageSize = 2;
+  const page = req.query.pageNumber || 1;
+  const keyword = req.query.keyword ? {
+    name: {
+      $regex: req.query.keyword,
+      $options: "i"
+    }
+  } : {}
+
+  // console.log(keyword);
+  const count = await Product.countDocuments({ ...keyword });
+  const products = await Product.find({ ...keyword }).limit(pageSize).skip(pageSize * (page - 1));
+  res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
 
@@ -95,7 +106,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 @access   Private
 */
 const createProductReview = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body;
+  const { review: { rating, comment } } = req.body;
   const product = await Product.findById(req.params.id);
   if (product) {
     const alreadyReviewd = product.reviews.find((r) => {
@@ -105,7 +116,7 @@ const createProductReview = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("product already reviewd");
     } else {
-      // console.log(req);
+      // console.log(req.body);
       const review = {
         name: req.user.name,
         rating: Number(rating),

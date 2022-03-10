@@ -42,6 +42,9 @@ function App() {
             <Route path="/admin/productlist" element={<ProductListPage />} exect />
             <Route path="/admin/product/:id/edit" element={<ProductEditPage />} exect />
             <Route path="/admin/orderlist" element={<OrderListPage />} exect />
+            <Route path="/search/:keyword" element={<HomePage />} exect />
+            <Route path="/page/:pageNumber" element={<HomePage />} exect />
+            <Route path="/search/:keyword/page/:pageNumber" element={<HomePage />} exect />
             <Route path="/" element={<HomePage />} exect />
           </Routes>
         </Container>
