@@ -84,40 +84,20 @@ export function productCreateReviewReducer(state = {}, action) {
   }
 }
 
+export function productTopRatedReducer(state = { products: [] }, action) {
+  switch (action.type) {
+    case constants.PRODUCT_TOP_REQUEST:
+      return { loading: true, products: [] }
+    case constants.PRODUCT_TOP_SUCCESS:
+      return { loading: false, products: action.payload }
+    case constants.PRODUCT_TOP_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state;
+  }
+}
 
 
 
-
-
-/////////////////////////////
-// function visibilityFilter(state = 'SHOW_ALL', action) {
-//   if (action.type === 'SET_VISIBILITY_FILTER') {
-//     return action.filter
-//   } else {
-//     return state
-//   }
-// }
-
-// function todos(state = [], action) {
-//   switch (action.type) {
-//     case 'ADD_TODO':
-//       return state.concat([{ text: action.text, completed: false }])
-//     case 'TOGGLE_TODO':
-//       return state.map((todo, index) =>
-//         action.index === index
-//           ? { text: todo.text, completed: !todo.completed }
-//           : todo
-//       )
-//     default:
-//       return state
-//   }
-// }
-
-// function todoApp(state = {}, action) {
-//   return {
-//     todos: todos(state.todos, action),
-//     visibilityFilter: visibilityFilter(state.visibilityFilter, action)
-//   }
-// }
 
 

@@ -7,6 +7,7 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useParams } from 'react-router-dom';
 import Paginate from '../components/Paginate';
+import ProductCarousel from '../components/ProductCarousel';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ const HomePage = () => {
 
 
   return <>
+    {!keyword && <ProductCarousel />}
     <h1>Latest Products</h1>
     {loading ? (<Loader />) : error ? (<Message variant="danger">{error}</Message>) :
       (<>
