@@ -7,6 +7,7 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 import { getUserDetails, updateUserProfile } from "../actions/userActions";
 import { myListOrders } from '../actions/orderActions';
+import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants';
 
 const ProfilePage = () => {
   const [name, setName] = useState("");
@@ -38,6 +39,7 @@ const ProfilePage = () => {
       navigate("/");
     } else {
       if (!user.name) {
+        dispatch({ type: USER_UPDATE_PROFILE_RESET })
         dispatch(getUserDetails("profile"))
         dispatch(myListOrders());
       } else {
